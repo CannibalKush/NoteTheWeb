@@ -1,0 +1,28 @@
+{
+  "name": "firefox-draw",
+  "version": "0.0.1",
+  "description": "A firefox extension that lets you draw on web pages.",
+  "main": "manifest.json",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CannibalKush/firefox-draw.git"
+  },
+  "keywords": [
+    "firefox",
+    "draw",
+    "stylus",
+    "notes"
+  ],
+  "author": "LSV",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/CannibalKush/firefox-draw/issues"
+  },
+  "homepage": "https://github.com/CannibalKush/firefox-draw#readme",
+  "dependencies": {
+    "js-draw": "^1.26.0"
+  }
+}
