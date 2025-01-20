@@ -14,7 +14,7 @@ export const NormalButton = ({
   normalIcon.textContent = "📝";
   return {
     normal: [
-      { icon: normalIcon, label: "Normal" },
+      { icon: normalIcon, label: "Draw" },
       () => {
         onSelect();
       },

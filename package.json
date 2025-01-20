@@ -5,8 +5,9 @@
   "main": "manifest.json",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack",
-    "dev": "webpack --watch"
+    "build": "webpack && web-ext build",
+    "watch": "webpack --watch",
+    "dev": "npm run watch & web-ext run"
   },
   "repository": {
     "type": "git",

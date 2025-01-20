@@ -19,7 +19,6 @@ export const TransparentButton = ({
         onSelect();
         const element = document.querySelector(".js-draw");
         if (!element) return;
-        console.log(element);
         element.classList.add("pointer-events-none");
       },
     ],

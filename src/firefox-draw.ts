@@ -6,7 +6,7 @@ import {
 } from "js-draw";
 import "js-draw/bundledStyles";
 import { Color4 } from "@js-draw/math";
-import { getSVG, queueSave } from "./db";
+import { getSVG, queueSave } from "./data/db";
 import { update } from "./update";
 import { initToolbar } from "./toolbar/toolbar";
 
@@ -22,7 +22,7 @@ const initializeEditor = () => {
     editor.setBackgroundStyle({
       color: Color4.transparent,
       autoresize: true,
-      type: BackgroundComponentBackgroundType.Grid,
+      // type: BackgroundComponentBackgroundType.Grid,
     })
   );
 

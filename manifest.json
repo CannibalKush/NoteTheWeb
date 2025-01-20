@@ -1,32 +1,29 @@
 {
-    "description": "A firefox extension that lets you draw on web pages.",
-    "manifest_version": 2,
-    "name": "Firefox Draw",
-    "version": "0.0.1",
-    "homepage_url": "https://github.com/CannibalKush/firefox-draw",
-    "content_scripts": [
-        {
-            "matches": [
-                "<all_urls>"
-            ],
-            "js": [
-                "firefox-draw.bundle.js"
-            ],
-            "css": [
-                "src/styles.css"
-            ]
-        }
-    ],
-    "icons": {
-        "48": "./icon.png"
-    },
-    "permissions": [
-        "activeTab",
-        "storage"
-    ],
-    "browser_action": {
-        "default_icon": "./icon.png",
-        "default_title": "Firefox Draw",
-        "default_popup": "src/popup/popup.html"
+  "description": "A firefox extension that lets you draw on web pages.",
+  "manifest_version": 2,
+  "name": "Firefox Draw",
+  "version": "0.0.1",
+  "homepage_url": "https://github.com/CannibalKush/firefox-draw",
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["firefox-draw.bundle.js"],
+      "css": ["src/styles.css"]
     }
+  ],
+  "icons": {
+    "48": "./icon.png"
+  },
+  "permissions": ["activeTab", "storage"],
+  "browser_action": {
+    "default_icon": "./icon.png",
+    "default_title": "Firefox Draw",
+    "default_popup": "src/popup/popup.html"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "firefox-draw@cannibal.kush",
+      "strict_min_version": "58.0"
+    }
+  }
 }

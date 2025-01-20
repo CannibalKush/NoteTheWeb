@@ -70,8 +70,5 @@ export const queueSave = (editor: Editor) => {
     editor.viewport.visibleRect.height
   );
   const svg = editor.toSVG({ minDimension: maxDimension });
-  console.log(svg);
-  saveSVG(document.location.href, svg.outerHTML)
-    .then(console.log)
-    .catch(console.error);
+  saveSVG(document.location.href, svg.outerHTML).catch(console.error);
 };

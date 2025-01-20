@@ -13,10 +13,71 @@ var jsdrawStyles=(()=>{(()=>{if(typeof document<"u"&&typeof document.createEleme
 
 /***/ }),
 
-/***/ "./src/db.ts":
-/*!*******************!*\
-  !*** ./src/db.ts ***!
-  \*******************/
+/***/ "./src/data/browser.ts":
+/*!*****************************!*\
+  !*** ./src/data/browser.ts ***!
+  \*****************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   getValue: () => (/* binding */ getValue),
+/* harmony export */   removeValue: () => (/* binding */ removeValue),
+/* harmony export */   storeValue: () => (/* binding */ storeValue)
+/* harmony export */ });
+/**
+ * Browser storage utility functions for Firefox extension
+ */
+/**
+ * Store a key-value pair in browser storage
+ * @param key Storage key
+ * @param value String value to store
+ */
+async function storeValue(key, value) {
+    try {
+        await browser.storage.sync.set({ [key]: value });
+    }
+    catch (error) {
+        console.error("Failed to store value:", error);
+        return;
+    }
+}
+/**
+ * Retrieve a value from browser storage
+ * @param key Storage key
+ * @returns The stored string value, or null if not found
+ */
+async function getValue(key) {
+    try {
+        const result = await browser.storage.sync.get(key);
+        return result[key] || null;
+    }
+    catch (error) {
+        console.error("Failed to retrieve value:", error);
+        return null;
+    }
+}
+/**
+ * Remove a key-value pair from browser storage
+ * @param key Storage key to remove
+ */
+async function removeValue(key) {
+    try {
+        await browser.storage.sync.remove(key);
+    }
+    catch (error) {
+        console.error("Failed to remove value:", error);
+        return;
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/data/db.ts":
+/*!************************!*\
+  !*** ./src/data/db.ts ***!
+  \************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -80,10 +141,7 @@ const queueSave = (editor) => {
     debounce = Date.now();
     const maxDimension = Math.max(editor.viewport.visibleRect.width, editor.viewport.visibleRect.height);
     const svg = editor.toSVG({ minDimension: maxDimension });
-    console.log(svg);
-    saveSVG(document.location.href, svg.outerHTML)
-        .then(console.log)
-        .catch(console.error);
+    saveSVG(document.location.href, svg.outerHTML).catch(console.error);
 };
 
 
@@ -201,7 +259,7 @@ const NormalButton = ({ onSelect, }) => {
     normalIcon.textContent = "📝";
     return {
         normal: [
-            { icon: normalIcon, label: "Normal" },
+            { icon: normalIcon, label: "Draw" },
             () => {
                 onSelect();
             },
@@ -236,7 +294,6 @@ const TransparentButton = ({ onSelect, }) => {
                 const element = document.querySelector(".js-draw");
                 if (!element)
                     return;
-                console.log(element);
                 element.classList.add("pointer-events-none");
             },
         ],
@@ -268,6 +325,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _btnTransparent__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./btnTransparent */ "./src/toolbar/btnTransparent.ts");
 /* harmony import */ var _btnHide__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./btnHide */ "./src/toolbar/btnHide.ts");
 /* harmony import */ var _btnNormal__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./btnNormal */ "./src/toolbar/btnNormal.ts");
+/* harmony import */ var _data_browser__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../data/browser */ "./src/data/browser.ts");
+
 
 
 
@@ -280,6 +339,16 @@ const initToolbar = (editor) => {
     const panTools = toolController.getMatchingTools(js_draw__WEBPACK_IMPORTED_MODULE_0__.PanZoomTool);
     toolController.removeAndDestroyTools(panTools);
     const toolbar = editor.addToolbar();
+    (0,_data_browser__WEBPACK_IMPORTED_MODULE_6__.getValue)("toolbarState").then((state) => {
+        if (state) {
+            try {
+                toolbar.deserializeState(state);
+            }
+            catch (e) {
+                console.warn("Error deserializing toolbar state: ", e);
+            }
+        }
+    });
     toolbar.addActionButton(...(0,_btnClose__WEBPACK_IMPORTED_MODULE_1__.CloseButton)());
     toolbar.addActionButton(...(0,_btnClear__WEBPACK_IMPORTED_MODULE_2__.ClearButton)(editor));
     const { transparent, resetTransparent } = (0,_btnTransparent__WEBPACK_IMPORTED_MODULE_3__.TransparentButton)({
@@ -314,7 +383,14 @@ const initToolbar = (editor) => {
         },
     });
     const normalButton = toolbar.addActionButton(...normal);
+    normalButton.addCSSClassToContainer("toggle-on");
+    timedSave(toolbar);
     return toolbar;
+};
+const timedSave = (toolbar) => {
+    const timedSaveInterval = setInterval(() => {
+        (0,_data_browser__WEBPACK_IMPORTED_MODULE_6__.storeValue)("toolbarState", toolbar.serializeState());
+    }, 10000);
 };
 
 
@@ -33736,7 +33812,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var js_draw_bundledStyles__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! js-draw/bundledStyles */ "./node_modules/js-draw/dist/bundledStyles.js");
 /* harmony import */ var js_draw_bundledStyles__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(js_draw_bundledStyles__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _js_draw_math__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @js-draw/math */ "./node_modules/@js-draw/math/dist/mjs/lib.mjs");
-/* harmony import */ var _db__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./db */ "./src/db.ts");
+/* harmony import */ var _data_db__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./data/db */ "./src/data/db.ts");
 /* harmony import */ var _update__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./update */ "./src/update.ts");
 /* harmony import */ var _toolbar_toolbar__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./toolbar/toolbar */ "./src/toolbar/toolbar.ts");
 
@@ -33755,15 +33831,15 @@ const initializeEditor = () => {
     editor.dispatch(editor.setBackgroundStyle({
         color: _js_draw_math__WEBPACK_IMPORTED_MODULE_2__.Color4.transparent,
         autoresize: true,
-        type: js_draw__WEBPACK_IMPORTED_MODULE_0__.BackgroundComponentBackgroundType.Grid,
+        // type: BackgroundComponentBackgroundType.Grid,
     }));
     editor.notifier.on(js_draw__WEBPACK_IMPORTED_MODULE_0__.EditorEventType.CommandDone, (event) => {
-        (0,_db__WEBPACK_IMPORTED_MODULE_3__.queueSave)(editor);
+        (0,_data_db__WEBPACK_IMPORTED_MODULE_3__.queueSave)(editor);
     });
     editor.notifier.on(js_draw__WEBPACK_IMPORTED_MODULE_0__.EditorEventType.CommandUndone, (event) => {
-        (0,_db__WEBPACK_IMPORTED_MODULE_3__.queueSave)(editor);
+        (0,_data_db__WEBPACK_IMPORTED_MODULE_3__.queueSave)(editor);
     });
-    (0,_db__WEBPACK_IMPORTED_MODULE_3__.getSVG)(document.location.href).then((svg) => {
+    (0,_data_db__WEBPACK_IMPORTED_MODULE_3__.getSVG)(document.location.href).then((svg) => {
         if (svg && typeof svg === "string") {
             editor.loadFromSVG(svg);
         }

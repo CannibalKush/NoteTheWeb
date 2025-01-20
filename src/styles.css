@@ -13,9 +13,9 @@
   pointer-events: auto !important;
 }
 
-.toolbar-internalWidgetId--document-properties-widget {
-  display: none;
-}
+/* .toolbar-internalWidgetId--document-properties-widget { */
+/* display: none; */
+/* } */
 
 .display-none {
   display: none;
