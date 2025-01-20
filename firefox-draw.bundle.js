@@ -13,9 +13,9 @@ var jsdrawStyles=(()=>{(()=>{if(typeof document<"u"&&typeof document.createEleme
 
 /***/ }),
 
-/***/ "./src/db.js":
+/***/ "./src/db.ts":
 /*!*******************!*\
-  !*** ./src/db.js ***!
+  !*** ./src/db.ts ***!
   \*******************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -29,86 +29,232 @@ __webpack_require__.r(__webpack_exports__);
 async function openDatabase() {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open("SVGStorageDB", 1);
-
         request.onupgradeneeded = (event) => {
             const db = event.target.result;
             if (!db.objectStoreNames.contains("SVGs")) {
                 db.createObjectStore("SVGs", { keyPath: "id" });
             }
         };
-
         request.onsuccess = (event) => {
             resolve(event.target.result);
         };
-
         request.onerror = (event) => {
             reject(event.target.error);
         };
     });
 }
-
 async function saveSVG(id, svgData) {
     const db = await openDatabase();
-
     return new Promise((resolve, reject) => {
         const transaction = db.transaction("SVGs", "readwrite");
         const store = transaction.objectStore("SVGs");
-
         const data = { id, svgData };
         const request = store.put(data);
-
         request.onsuccess = () => {
             resolve("SVG saved successfully!");
         };
-
         request.onerror = (event) => {
             reject(event.target.error);
         };
     });
 }
-
 async function getSVG(id) {
     const db = await openDatabase();
-
     return new Promise((resolve, reject) => {
         const transaction = db.transaction("SVGs", "readonly");
         const store = transaction.objectStore("SVGs");
-
         const request = store.get(id);
-
         request.onsuccess = (event) => {
             resolve(event.target.result?.svgData || null);
         };
-
         request.onerror = (event) => {
             reject(event.target.error);
         };
     });
 }
-
 let debounce = null;
 const queueSave = (editor) => {
-  if (Date.now() - debounce < 2000) {
-    return;
-  }
-
-  debounce = Date.now();
-  const maxDimension = Math.max(
-    editor.viewport.visibleRect.width,
-    editor.viewport.visibleRect.height
-  );
-  const svg = editor.toSVG({ minDimension: maxDimension });
-  console.log(svg);
-  saveSVG(document.location.href, svg.outerHTML)
-    .then(console.log)
-    .catch(console.error);
+    if (debounce && Date.now() - debounce < 2000) {
+        return;
+    }
+    debounce = Date.now();
+    const maxDimension = Math.max(editor.viewport.visibleRect.width, editor.viewport.visibleRect.height);
+    const svg = editor.toSVG({ minDimension: maxDimension });
+    console.log(svg);
+    saveSVG(document.location.href, svg.outerHTML)
+        .then(console.log)
+        .catch(console.error);
 };
+
 
 /***/ }),
 
-/***/ "./src/toolbar/toolbar.js":
+/***/ "./src/toolbar/btnClear.ts":
+/*!*********************************!*\
+  !*** ./src/toolbar/btnClear.ts ***!
+  \*********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   ClearButton: () => (/* binding */ ClearButton)
+/* harmony export */ });
+/* harmony import */ var js_draw__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! js-draw */ "./node_modules/js-draw/dist/mjs/lib.mjs");
+
+const ClearButton = (editor) => {
+    const clearIcon = document.createElement("div");
+    clearIcon.textContent = "🧹";
+    return [
+        { icon: clearIcon, label: "Clear" },
+        () => {
+            const allComponents = editor.image.getAllElements();
+            const deleteCommand = new js_draw__WEBPACK_IMPORTED_MODULE_0__.Erase(allComponents);
+            editor.dispatch(deleteCommand);
+        },
+    ];
+};
+// Clear icon clears the canvas
+// const clearIcon = document.createElement("div");
+// clearIcon.textContent = "🧹";
+// toolbar.addActionButton({ icon: clearIcon, label: "Clear" }, () => {
+// });
+
+
+/***/ }),
+
+/***/ "./src/toolbar/btnClose.ts":
+/*!*********************************!*\
+  !*** ./src/toolbar/btnClose.ts ***!
+  \*********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   CloseButton: () => (/* binding */ CloseButton)
+/* harmony export */ });
+const CloseButton = () => {
+    const closeIcon = document.createElement("div");
+    closeIcon.textContent = "❌";
+    return [
+        { icon: closeIcon, label: "Close" },
+        () => {
+            document.querySelector(".js-draw")?.classList.add("display-none");
+        },
+    ];
+};
+
+
+/***/ }),
+
+/***/ "./src/toolbar/btnHide.ts":
 /*!********************************!*\
-  !*** ./src/toolbar/toolbar.js ***!
+  !*** ./src/toolbar/btnHide.ts ***!
+  \********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   HideButton: () => (/* binding */ HideButton)
+/* harmony export */ });
+const HideButton = ({ onSelect, }) => {
+    const hideIcon = document.createElement("div");
+    hideIcon.textContent = "👁️";
+    return {
+        hide: [
+            { icon: hideIcon, label: "Hide" },
+            () => {
+                onSelect();
+                const element = document.querySelector(".imageEditorRenderArea");
+                const drawElement = document.querySelector(".js-draw");
+                if (!element || !drawElement)
+                    return;
+                element.classList.add("visibility-hidden");
+                drawElement.classList.add("pointer-events-none");
+            },
+        ],
+        resetHide: () => {
+            const element = document.querySelector(".imageEditorRenderArea");
+            const drawElement = document.querySelector(".js-draw");
+            if (!element || !drawElement)
+                return;
+            element.classList.remove("visibility-hidden");
+            drawElement.classList.remove("pointer-events-none");
+        },
+    };
+};
+
+
+/***/ }),
+
+/***/ "./src/toolbar/btnNormal.ts":
+/*!**********************************!*\
+  !*** ./src/toolbar/btnNormal.ts ***!
+  \**********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   NormalButton: () => (/* binding */ NormalButton)
+/* harmony export */ });
+const NormalButton = ({ onSelect, }) => {
+    const normalIcon = document.createElement("div");
+    normalIcon.textContent = "📝";
+    return {
+        normal: [
+            { icon: normalIcon, label: "Normal" },
+            () => {
+                onSelect();
+            },
+        ],
+        resetNormal: () => {
+            //
+        },
+    };
+};
+
+
+/***/ }),
+
+/***/ "./src/toolbar/btnTransparent.ts":
+/*!***************************************!*\
+  !*** ./src/toolbar/btnTransparent.ts ***!
+  \***************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   TransparentButton: () => (/* binding */ TransparentButton)
+/* harmony export */ });
+const TransparentButton = ({ onSelect, }) => {
+    const transparentIcon = document.createElement("div");
+    transparentIcon.textContent = "🪟";
+    return {
+        transparent: [
+            { icon: transparentIcon, label: "Transparent" },
+            () => {
+                onSelect();
+                const element = document.querySelector(".js-draw");
+                if (!element)
+                    return;
+                console.log(element);
+                element.classList.add("pointer-events-none");
+            },
+        ],
+        resetTransparent: () => {
+            const element = document.querySelector(".js-draw");
+            if (!element)
+                return;
+            element.classList.remove("pointer-events-none");
+        },
+    };
+};
+
+
+/***/ }),
+
+/***/ "./src/toolbar/toolbar.ts":
+/*!********************************!*\
+  !*** ./src/toolbar/toolbar.ts ***!
   \********************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -117,93 +263,66 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   initToolbar: () => (/* binding */ initToolbar)
 /* harmony export */ });
 /* harmony import */ var js_draw__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! js-draw */ "./node_modules/js-draw/dist/mjs/lib.mjs");
+/* harmony import */ var _btnClose__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./btnClose */ "./src/toolbar/btnClose.ts");
+/* harmony import */ var _btnClear__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./btnClear */ "./src/toolbar/btnClear.ts");
+/* harmony import */ var _btnTransparent__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./btnTransparent */ "./src/toolbar/btnTransparent.ts");
+/* harmony import */ var _btnHide__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./btnHide */ "./src/toolbar/btnHide.ts");
+/* harmony import */ var _btnNormal__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./btnNormal */ "./src/toolbar/btnNormal.ts");
 
 
+
+
+
+
+let mode = "draw";
 const initToolbar = (editor) => {
-  const toolController = editor.toolController;
-  const panTools = toolController.getMatchingTools(js_draw__WEBPACK_IMPORTED_MODULE_0__.PanZoomTool);
-  toolController.removeAndDestroyTools(panTools);
-  const toolbar = editor.addToolbar();
-
-  // Visibility icon hides the toolbar
-  const visibilityIcon = document.createElement("div");
-  visibilityIcon.textContent = "👁️";
-  toolbar.addActionButton(
-    { icon: visibilityIcon, label: "Hide toolbar" },
-    () => {
-      toolbar.toolbarContainer.classList.add("display-none");
-    }
-  );
-
-  // Pointer events icon allows you to click through the canvas
-  const pointerEventsIcon = document.createElement("div");
-  pointerEventsIcon.textContent = "✏";
-  const clickThroughButton = toolbar.addActionButton(
-    { icon: pointerEventsIcon, label: "Click through" },
-    () => {
-      const enable = document
-        .querySelector(".js-draw")
-        .classList.contains("pointer-events-none");
-      clickThrough(enable, clickThroughButton);
-    }
-  );
-
-  // Clear icon clears the canvas
-  const clearIcon = document.createElement("div");
-  clearIcon.textContent = "🧹";
-  toolbar.addActionButton({ icon: clearIcon, label: "Clear" }, () => {
-    const allComponents = editor.image.getAllElements();
-    const deleteCommand = new js_draw__WEBPACK_IMPORTED_MODULE_0__.Erase(allComponents);
-    editor.dispatch(deleteCommand);
-  });
-
-  // Hide icon hides the drawings
-
-  const hideIcon = document.createElement("div");
-  hideIcon.textContent = "🫣";
-  const hideButton = toolbar.addActionButton(
-    { icon: hideIcon, label: "Hide drawings" },
-    () => {
-      const enable = document
-        .querySelector(".imageEditorRenderArea")
-        .classList.contains("visibility-hidden");
-      hideDrawings(enable, hideButton);
-    }
-  );
-
-  return toolbar;
-};
-
-const clickThrough = (enable, clickThroughButton) => {
-  if (enable) {
-    clickThroughButton.removeCSSClassFromContainer("toggle-on");
-    document.querySelector(".js-draw").classList.remove("pointer-events-none");
-  } else {
-    clickThroughButton.addCSSClassToContainer("toggle-on");
-    document.querySelector(".js-draw").classList.add("pointer-events-none");
-  }
-};
-
-const hideDrawings = (enable, hideButton) => {
-  if (enable) {
-    hideButton.removeCSSClassFromContainer("toggle-on");
-    document
-      .querySelector(".imageEditorRenderArea")
-      .classList.remove("visibility-hidden");
-  } else {
-    hideButton.addCSSClassToContainer("toggle-on");
-    document
-      .querySelector(".imageEditorRenderArea")
-      .classList.add("visibility-hidden");
-  }
+    const toolController = editor.toolController;
+    const panTools = toolController.getMatchingTools(js_draw__WEBPACK_IMPORTED_MODULE_0__.PanZoomTool);
+    toolController.removeAndDestroyTools(panTools);
+    const toolbar = editor.addToolbar();
+    toolbar.addActionButton(...(0,_btnClose__WEBPACK_IMPORTED_MODULE_1__.CloseButton)());
+    toolbar.addActionButton(...(0,_btnClear__WEBPACK_IMPORTED_MODULE_2__.ClearButton)(editor));
+    const { transparent, resetTransparent } = (0,_btnTransparent__WEBPACK_IMPORTED_MODULE_3__.TransparentButton)({
+        onSelect: () => {
+            resetHide();
+            mode = "transparent";
+            transparentButton.addCSSClassToContainer("toggle-on");
+            hideButton.removeCSSClassFromContainer("toggle-on");
+            normalButton.removeCSSClassFromContainer("toggle-on");
+        },
+    });
+    const transparentButton = toolbar.addActionButton(...transparent);
+    transparentButton.addCSSClassToContainer("margin-left-48");
+    const { hide, resetHide } = (0,_btnHide__WEBPACK_IMPORTED_MODULE_4__.HideButton)({
+        onSelect: () => {
+            resetTransparent();
+            mode = "hide";
+            hideButton.addCSSClassToContainer("toggle-on");
+            transparentButton.removeCSSClassFromContainer("toggle-on");
+            normalButton.removeCSSClassFromContainer("toggle-on");
+        },
+    });
+    const hideButton = toolbar.addActionButton(...hide);
+    const { normal, resetNormal } = (0,_btnNormal__WEBPACK_IMPORTED_MODULE_5__.NormalButton)({
+        onSelect: () => {
+            resetHide();
+            resetTransparent();
+            mode = "draw";
+            normalButton.addCSSClassToContainer("toggle-on");
+            hideButton.removeCSSClassFromContainer("toggle-on");
+            transparentButton.removeCSSClassFromContainer("toggle-on");
+        },
+    });
+    const normalButton = toolbar.addActionButton(...normal);
+    return toolbar;
 };
 
 
 /***/ }),
 
-/***/ "./src/update.js":
+/***/ "./src/update.ts":
 /*!***********************!*\
-  !*** ./src/update.js ***!
+  !*** ./src/update.ts ***!
   \***********************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -215,24 +334,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _js_draw_math__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @js-draw/math */ "./node_modules/@js-draw/math/dist/mjs/lib.mjs");
 
 
-
 let lastPos = { x: 0, y: 0 };
-
 function update(edtr, wndw) {
-  const scrollX = wndw.scrollX;
-  const scrollY = wndw.scrollY;
-
-  const deltaX = scrollX - lastPos.x;
-  const deltaY = lastPos.y - scrollY;
-
-  if (deltaX !== 0 || deltaY !== 0) {
-    const delta = _js_draw_math__WEBPACK_IMPORTED_MODULE_1__.Mat33.translation(_js_draw_math__WEBPACK_IMPORTED_MODULE_1__.Vec2.of(deltaX, deltaY));
-
-    const deltaCommand = js_draw__WEBPACK_IMPORTED_MODULE_0__.Viewport.transformBy(delta);
-    deltaCommand.apply(edtr);
-  }
-
-  lastPos = { x: scrollX, y: scrollY };
+    const scrollX = wndw.scrollX;
+    const scrollY = wndw.scrollY;
+    const deltaX = scrollX - lastPos.x;
+    const deltaY = lastPos.y - scrollY;
+    if (deltaX !== 0 || deltaY !== 0) {
+        const delta = _js_draw_math__WEBPACK_IMPORTED_MODULE_1__.Mat33.translation(_js_draw_math__WEBPACK_IMPORTED_MODULE_1__.Vec2.of(deltaX, deltaY));
+        const deltaCommand = js_draw__WEBPACK_IMPORTED_MODULE_0__.Viewport.transformBy(delta);
+        deltaCommand.apply(edtr);
+    }
+    lastPos = { x: scrollX, y: scrollY };
 }
 
 
@@ -33616,17 +33729,16 @@ var __webpack_exports__ = {};
 // This entry needs to be wrapped in an IIFE because it needs to be isolated against other modules in the chunk.
 (() => {
 /*!*****************************!*\
-  !*** ./src/firefox-draw.js ***!
+  !*** ./src/firefox-draw.ts ***!
   \*****************************/
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var js_draw__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! js-draw */ "./node_modules/js-draw/dist/mjs/lib.mjs");
 /* harmony import */ var js_draw_bundledStyles__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! js-draw/bundledStyles */ "./node_modules/js-draw/dist/bundledStyles.js");
 /* harmony import */ var js_draw_bundledStyles__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(js_draw_bundledStyles__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _js_draw_math__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @js-draw/math */ "./node_modules/@js-draw/math/dist/mjs/lib.mjs");
-/* harmony import */ var _db__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./db */ "./src/db.js");
-/* harmony import */ var _update__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./update */ "./src/update.js");
-/* harmony import */ var _toolbar_toolbar__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./toolbar/toolbar */ "./src/toolbar/toolbar.js");
-
+/* harmony import */ var _db__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./db */ "./src/db.ts");
+/* harmony import */ var _update__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./update */ "./src/update.ts");
+/* harmony import */ var _toolbar_toolbar__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./toolbar/toolbar */ "./src/toolbar/toolbar.ts");
 
 
 
@@ -33634,48 +33746,42 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const initializeEditor = () => {
-  const editor = new js_draw__WEBPACK_IMPORTED_MODULE_0__.Editor(document.body, {
-    wheelEventsEnabled: false,
-    maxZoom: 1,
-    minZoom: 1,
-  });
-  const toolbar = (0,_toolbar_toolbar__WEBPACK_IMPORTED_MODULE_5__.initToolbar)(editor);
-
-  editor.dispatch(
-    editor.setBackgroundStyle({
-      color: _js_draw_math__WEBPACK_IMPORTED_MODULE_2__.Color4.transparent,
-      autoresize: true,
-      type: js_draw__WEBPACK_IMPORTED_MODULE_0__.BackgroundComponentBackgroundType.Grid,
-    })
-  );
-
-  editor.notifier.on(js_draw__WEBPACK_IMPORTED_MODULE_0__.EditorEventType.CommandDone, (event) => {
-    (0,_db__WEBPACK_IMPORTED_MODULE_3__.queueSave)(editor);
-  });
-
-  editor.notifier.on(js_draw__WEBPACK_IMPORTED_MODULE_0__.EditorEventType.CommandUndone, (event) => {
-    (0,_db__WEBPACK_IMPORTED_MODULE_3__.queueSave)(editor);
-  });
-
-  (0,_db__WEBPACK_IMPORTED_MODULE_3__.getSVG)(document.location.href).then((svg) => {
-    if (svg) {
-      editor.loadFromSVG(svg);
-    }
-  });
-
-  return { editor, toolbar };
+    const editor = new js_draw__WEBPACK_IMPORTED_MODULE_0__.Editor(document.body, {
+        wheelEventsEnabled: false,
+        maxZoom: 1,
+        minZoom: 1,
+    });
+    const toolbar = (0,_toolbar_toolbar__WEBPACK_IMPORTED_MODULE_5__.initToolbar)(editor);
+    editor.dispatch(editor.setBackgroundStyle({
+        color: _js_draw_math__WEBPACK_IMPORTED_MODULE_2__.Color4.transparent,
+        autoresize: true,
+        type: js_draw__WEBPACK_IMPORTED_MODULE_0__.BackgroundComponentBackgroundType.Grid,
+    }));
+    editor.notifier.on(js_draw__WEBPACK_IMPORTED_MODULE_0__.EditorEventType.CommandDone, (event) => {
+        (0,_db__WEBPACK_IMPORTED_MODULE_3__.queueSave)(editor);
+    });
+    editor.notifier.on(js_draw__WEBPACK_IMPORTED_MODULE_0__.EditorEventType.CommandUndone, (event) => {
+        (0,_db__WEBPACK_IMPORTED_MODULE_3__.queueSave)(editor);
+    });
+    (0,_db__WEBPACK_IMPORTED_MODULE_3__.getSVG)(document.location.href).then((svg) => {
+        if (svg && typeof svg === "string") {
+            editor.loadFromSVG(svg);
+        }
+    });
+    return { editor, toolbar };
 };
-
-const { editor, toolbar } = initializeEditor();
-
+let editor;
+let toolbar;
 document.addEventListener("scroll", () => {
-  (0,_update__WEBPACK_IMPORTED_MODULE_4__.update)(editor, window);
+    (0,_update__WEBPACK_IMPORTED_MODULE_4__.update)(editor, window);
 });
-
 browser.runtime.onMessage.addListener((message) => {
-  if (message.command === "show-toolbar") {
-    toolbar.toolbarContainer.classList.remove("display-none");
-  }
+    if (message.command === "show-toolbar") {
+        if (!toolbar || !editor) {
+            ({ editor, toolbar } = initializeEditor());
+        }
+        document.querySelector(".js-draw")?.classList.remove("display-none");
+    }
 });
 
 })();

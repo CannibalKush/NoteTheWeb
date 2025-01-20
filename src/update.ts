@@ -1,9 +1,9 @@
-import { Viewport } from "js-draw";
+import { Viewport, Editor } from "js-draw";
 import { Mat33, Vec2 } from "@js-draw/math";
 
 let lastPos = { x: 0, y: 0 };
 
-export function update(edtr, wndw) {
+export function update(edtr: Editor, wndw: Window) {
   const scrollX = wndw.scrollX;
   const scrollY = wndw.scrollY;
 

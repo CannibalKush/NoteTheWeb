@@ -2,6 +2,7 @@ import {
   Editor,
   BackgroundComponentBackgroundType,
   EditorEventType,
+  AbstractToolbar,
 } from "js-draw";
 import "js-draw/bundledStyles";
 import { Color4 } from "@js-draw/math";
@@ -34,7 +35,7 @@ const initializeEditor = () => {
   });
 
   getSVG(document.location.href).then((svg) => {
-    if (svg) {
+    if (svg && typeof svg === "string") {
       editor.loadFromSVG(svg);
     }
   });
@@ -42,7 +43,8 @@ const initializeEditor = () => {
   return { editor, toolbar };
 };
 
-const { editor, toolbar } = initializeEditor();
+let editor: Editor;
+let toolbar: AbstractToolbar;
 
 document.addEventListener("scroll", () => {
   update(editor, window);
@@ -50,6 +52,9 @@ document.addEventListener("scroll", () => {
 
 browser.runtime.onMessage.addListener((message) => {
   if (message.command === "show-toolbar") {
-    toolbar.toolbarContainer.classList.remove("display-none");
+    if (!toolbar || !editor) {
+      ({ editor, toolbar } = initializeEditor());
+    }
+    document.querySelector(".js-draw")?.classList.remove("display-none");
   }
 });

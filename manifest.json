@@ -21,7 +21,8 @@
         "48": "./icon.png"
     },
     "permissions": [
-        "activeTab"
+        "activeTab",
+        "storage"
     ],
     "browser_action": {
         "default_icon": "./icon.png",

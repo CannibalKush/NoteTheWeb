@@ -1,34 +1,38 @@
 .js-draw {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: transparent;
-    z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: transparent;
+  z-index: 1000;
 }
 
 .toolbar-root {
-    z-index: 1001;
-    pointer-events: auto !important;
+  z-index: 1001;
+  pointer-events: auto !important;
 }
 
 .toolbar-internalWidgetId--document-properties-widget {
-    display: none;
+  display: none;
 }
 
 .display-none {
-    display: none;
+  display: none;
 }
 
 .visibility-hidden {
-    visibility: hidden;
+  visibility: hidden;
 }
 
 .pointer-events-none {
-    pointer-events: none;
+  pointer-events: none;
 }
 
 .toggle-on {
-    background-color: #4c48;
+  background-color: #4c48;
+}
+
+.margin-left-48 {
+  margin-left: 48px;
 }
