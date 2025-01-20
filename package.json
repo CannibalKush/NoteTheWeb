@@ -1,5 +1,5 @@
 {
-  "name": "firefox-draw",
+  "name": "notetheweb",
   "version": "0.0.1",
   "description": "A firefox extension that lets you draw on web pages.",
   "main": "manifest.json",
@@ -39,7 +39,6 @@
     "webpack-cli": "^6.0.1"
   },
   "dependencies": {
-    "js-draw": "^1.26.0",
-    "preact": "^10.25.4"
+    "js-draw": "^1.26.0"
   }
 }

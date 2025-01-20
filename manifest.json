@@ -1,7 +1,7 @@
 {
   "description": "A firefox extension that lets you draw on web pages.",
   "manifest_version": 2,
-  "name": "Firefox Draw",
+  "name": "NoteTheWeb",
   "version": "0.0.1",
   "homepage_url": "https://github.com/CannibalKush/firefox-draw",
   "content_scripts": [
@@ -17,12 +17,12 @@
   "permissions": ["activeTab", "storage"],
   "browser_action": {
     "default_icon": "./icon.png",
-    "default_title": "Firefox Draw",
+    "default_title": "NoteTheWeb",
     "default_popup": "src/popup/popup.html"
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "firefox-draw@cannibal.kush",
+      "id": "notetheweb@cannibal.kush",
       "strict_min_version": "58.0"
     }
   }
