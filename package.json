@@ -4,7 +4,9 @@
   "description": "A firefox extension that lets you draw on web pages.",
   "main": "manifest.json",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack",
+    "dev": "webpack --watch"
   },
   "repository": {
     "type": "git",
@@ -22,6 +24,15 @@
     "url": "https://github.com/CannibalKush/firefox-draw/issues"
   },
   "homepage": "https://github.com/CannibalKush/firefox-draw#readme",
+  "devDependencies": {
+    "css-loader": "^7.1.2",
+    "sass": "^1.83.4",
+    "sass-loader": "^16.0.4",
+    "style-loader": "^4.0.0",
+    "web-ext": "^8.3.0",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^6.0.1"
+  },
   "dependencies": {
     "js-draw": "^1.26.0"
   }

@@ -1,0 +1,13 @@
+diff --git a/node_modules/js-draw/dist/mjs/util/ReactiveValue.mjs b/node_modules/js-draw/dist/mjs/util/ReactiveValue.mjs
+index 52295f7..e34a65a 100644
+--- a/node_modules/js-draw/dist/mjs/util/ReactiveValue.mjs
++++ b/node_modules/js-draw/dist/mjs/util/ReactiveValue.mjs
+@@ -69,7 +69,7 @@ export class ReactiveValue {
+      */
+     static fromCallback(callback, sourceValues) {
+         const result = new ReactiveValueImpl(callback());
+-        const resultRef = window.WeakRef
++        const resultRef = false
+             ? new window.WeakRef(result)
+             : { deref: () => result };
+         for (const value of sourceValues) {
