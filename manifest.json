@@ -2,7 +2,7 @@
   "description": "A firefox extension that lets you draw on web pages.",
   "manifest_version": 2,
   "name": "NoteTheWeb",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "homepage_url": "https://github.com/CannibalKush/firefox-draw",
   "content_scripts": [
     {
