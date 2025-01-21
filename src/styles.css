@@ -5,17 +5,17 @@
   width: 100vw;
   height: 100vh;
   background-color: transparent;
-  z-index: 1000;
+  z-index: 1202;
 }
 
 .toolbar-root {
-  z-index: 1001;
+  z-index: 1202;
   pointer-events: auto !important;
 }
 
-/* .toolbar-internalWidgetId--document-properties-widget { */
-/* display: none; */
-/* } */
+.clr-picker {
+  z-index: 1203;
+}
 
 .display-none {
   display: none;

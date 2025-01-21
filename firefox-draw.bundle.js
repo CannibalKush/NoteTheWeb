@@ -404,7 +404,8 @@ const timedSave = (toolbar) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   update: () => (/* binding */ update)
+/* harmony export */   update: () => (/* binding */ update),
+/* harmony export */   updateZoom: () => (/* binding */ updateZoom)
 /* harmony export */ });
 /* harmony import */ var js_draw__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! js-draw */ "./node_modules/js-draw/dist/mjs/lib.mjs");
 /* harmony import */ var _js_draw_math__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @js-draw/math */ "./node_modules/@js-draw/math/dist/mjs/lib.mjs");
@@ -422,6 +423,20 @@ function update(edtr, wndw) {
         deltaCommand.apply(edtr);
     }
     lastPos = { x: scrollX, y: scrollY };
+}
+let lastZoom = 1;
+function updateZoom(edtr, wndw) {
+    const zoom = wndw.devicePixelRatio;
+    if (zoom !== lastZoom) {
+        const zoomFactor = zoom / lastZoom;
+        const deltaZoom = _js_draw_math__WEBPACK_IMPORTED_MODULE_1__.Mat33.translation(_js_draw_math__WEBPACK_IMPORTED_MODULE_1__.Vec2.of(0, 0)).rightMul(_js_draw_math__WEBPACK_IMPORTED_MODULE_1__.Mat33.scaling2D(zoomFactor));
+        const zoomCommand = js_draw__WEBPACK_IMPORTED_MODULE_0__.Viewport.transformBy(deltaZoom);
+        zoomCommand.apply(edtr);
+        lastZoom = zoom;
+    }
+    requestAnimationFrame(() => {
+        updateZoom(edtr, wndw);
+    });
 }
 
 
@@ -33824,8 +33839,8 @@ __webpack_require__.r(__webpack_exports__);
 const initializeEditor = () => {
     const editor = new js_draw__WEBPACK_IMPORTED_MODULE_0__.Editor(document.body, {
         wheelEventsEnabled: false,
-        maxZoom: 1,
-        minZoom: 1,
+        // maxZoom: 1,
+        // minZoom: 1,
     });
     const toolbar = (0,_toolbar_toolbar__WEBPACK_IMPORTED_MODULE_5__.initToolbar)(editor);
     editor.dispatch(editor.setBackgroundStyle({
@@ -33849,13 +33864,16 @@ const initializeEditor = () => {
 let editor;
 let toolbar;
 document.addEventListener("scroll", () => {
-    (0,_update__WEBPACK_IMPORTED_MODULE_4__.update)(editor, window);
+    if (editor) {
+        (0,_update__WEBPACK_IMPORTED_MODULE_4__.update)(editor, window);
+    }
 });
 browser.runtime.onMessage.addListener((message) => {
     if (message.command === "show-toolbar") {
         if (!toolbar || !editor) {
             ({ editor, toolbar } = initializeEditor());
         }
+        (0,_update__WEBPACK_IMPORTED_MODULE_4__.updateZoom)(editor, window);
         document.querySelector(".js-draw")?.classList.remove("display-none");
     }
 });

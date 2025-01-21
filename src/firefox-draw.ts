@@ -7,14 +7,14 @@ import {
 import "js-draw/bundledStyles";
 import { Color4 } from "@js-draw/math";
 import { getSVG, queueSave } from "./data/db";
-import { update } from "./update";
+import { update, updateZoom } from "./update";
 import { initToolbar } from "./toolbar/toolbar";
 
 const initializeEditor = () => {
   const editor = new Editor(document.body, {
     wheelEventsEnabled: false,
-    maxZoom: 1,
-    minZoom: 1,
+    // maxZoom: 1,
+    // minZoom: 1,
   });
   const toolbar = initToolbar(editor);
 
@@ -47,7 +47,9 @@ let editor: Editor;
 let toolbar: AbstractToolbar;
 
 document.addEventListener("scroll", () => {
-  update(editor, window);
+  if (editor) {
+    update(editor, window);
+  }
 });
 
 browser.runtime.onMessage.addListener((message) => {
@@ -55,6 +57,8 @@ browser.runtime.onMessage.addListener((message) => {
     if (!toolbar || !editor) {
       ({ editor, toolbar } = initializeEditor());
     }
+
+    updateZoom(editor, window);
     document.querySelector(".js-draw")?.classList.remove("display-none");
   }
 });
