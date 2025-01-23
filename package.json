@@ -1,6 +1,6 @@
 {
   "name": "notetheweb",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A firefox extension that lets you draw on web pages.",
   "main": "manifest.json",
   "scripts": {
