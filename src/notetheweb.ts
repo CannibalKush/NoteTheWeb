@@ -26,6 +26,17 @@ const initializeEditor = () => {
     queueSave(editor);
   });
 
+  editor.notifier.on(EditorEventType.ViewportChanged, (event) => {
+    setTimeout(() => {
+      if (
+        editor.viewport.visibleRect.x - window.scrollX > 1 ||
+        editor.viewport.visibleRect.y - window.scrollY > 1
+      ) {
+        syncViewport(editor, window);
+      }
+    }, 100);
+  });
+
   getSVG(document.location.href).then((svg) => {
     if (svg && typeof svg === "string") {
       editor.loadFromSVG(svg);
@@ -43,7 +54,6 @@ let toolbar: AbstractToolbar;
 
 document.addEventListener("scroll", () => {
   if (editor) {
-    console.log("scroll");
     syncViewport(editor, window);
   }
 });
