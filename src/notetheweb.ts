@@ -1,20 +1,13 @@
-import {
-  Editor,
-  BackgroundComponentBackgroundType,
-  EditorEventType,
-  AbstractToolbar,
-} from "js-draw";
+import { Editor, EditorEventType, AbstractToolbar } from "js-draw";
 import "js-draw/bundledStyles";
 import { Color4 } from "@js-draw/math";
 import { getSVG, queueSave } from "./data/db";
-import { update, updateZoom } from "./update";
+import { syncViewport } from "./update";
 import { initToolbar } from "./toolbar/toolbar";
 
 const initializeEditor = () => {
   const editor = new Editor(document.body, {
     wheelEventsEnabled: false,
-    // maxZoom: 1,
-    // minZoom: 1,
   });
   const toolbar = initToolbar(editor);
 
@@ -22,7 +15,6 @@ const initializeEditor = () => {
     editor.setBackgroundStyle({
       color: Color4.transparent,
       autoresize: true,
-      // type: BackgroundComponentBackgroundType.Grid,
     })
   );
 
@@ -39,6 +31,9 @@ const initializeEditor = () => {
       editor.loadFromSVG(svg);
     }
   });
+  setTimeout(() => {
+    syncViewport(editor, window);
+  }, 100);
 
   return { editor, toolbar };
 };
@@ -48,7 +43,8 @@ let toolbar: AbstractToolbar;
 
 document.addEventListener("scroll", () => {
   if (editor) {
-    update(editor, window);
+    console.log("scroll");
+    syncViewport(editor, window);
   }
 });
 
@@ -58,7 +54,6 @@ browser.runtime.onMessage.addListener((message) => {
       ({ editor, toolbar } = initializeEditor());
     }
 
-    updateZoom(editor, window);
     document.querySelector(".js-draw")?.classList.remove("display-none");
   }
 });

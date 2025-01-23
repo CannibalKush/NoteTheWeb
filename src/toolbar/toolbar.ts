@@ -76,5 +76,5 @@ export const initToolbar = (editor: Editor) => {
 const timedSave = (toolbar: AbstractToolbar) => {
   const timedSaveInterval = setInterval(() => {
     storeValue("toolbarState", toolbar.serializeState());
-  }, 10000);
+  }, 5000);
 };

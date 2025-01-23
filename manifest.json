@@ -7,7 +7,7 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["firefox-draw.bundle.js"],
+      "js": ["notetheweb.bundle.js"],
       "css": ["src/styles.css"]
     }
   ],

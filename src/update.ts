@@ -1,44 +1,38 @@
-import { Viewport, Editor } from "js-draw";
-import { Mat33, Vec2, Point2 } from "@js-draw/math";
+import { Viewport, Editor, Vec3 } from "js-draw";
+import { Mat33 } from "@js-draw/math";
 
-let lastPos = { x: 0, y: 0 };
+export function syncViewport(edtr: Editor, wndw: Window) {
+  const domViewport = () => {
+    return {
+      x: wndw.scrollX,
+      y: wndw.scrollY,
+      width: wndw.innerWidth,
+      height: wndw.innerHeight,
+    };
+  };
 
-export function update(edtr: Editor, wndw: Window) {
-  const scrollX = wndw.scrollX;
-  const scrollY = wndw.scrollY;
+  const drawViewport = () => {
+    return {
+      x: edtr.viewport.visibleRect.x,
+      y: edtr.viewport.visibleRect.y,
+      width: edtr.viewport.visibleRect.width,
+      height: edtr.viewport.visibleRect.height,
+    };
+  };
 
-  const deltaX = scrollX - lastPos.x;
-  const deltaY = lastPos.y - scrollY;
+  const scale = drawViewport().width / domViewport().width;
 
-  if (deltaX !== 0 || deltaY !== 0) {
-    const delta = Mat33.translation(Vec2.of(deltaX, deltaY));
+  const command = Viewport.transformBy(Mat33.scaling2D(scale)); // 2
+  command.apply(edtr);
 
-    const deltaCommand = Viewport.transformBy(delta);
-    deltaCommand.apply(edtr);
-  }
+  const delta = Mat33.translation(
+    Vec3.of(
+      drawViewport().x - domViewport().x,
+      drawViewport().y - domViewport().y,
+      0
+    )
+  );
 
-  lastPos = { x: scrollX, y: scrollY };
-}
-
-let lastZoom = 1;
-export function updateZoom(edtr: Editor, wndw: Window) {
-  const zoom = wndw.devicePixelRatio;
-
-  if (zoom !== lastZoom) {
-    const zoomFactor = zoom / lastZoom;
-
-    const deltaZoom = Mat33.translation(Vec2.of(0, 0)).rightMul(
-      Mat33.scaling2D(zoomFactor)
-    );
-
-    const zoomCommand = Viewport.transformBy(deltaZoom);
-
-    zoomCommand.apply(edtr);
-
-    lastZoom = zoom;
-  }
-
-  requestAnimationFrame(() => {
-    updateZoom(edtr, wndw);
-  });
+  const viewportCommand = Viewport.transformBy(delta);
+  viewportCommand.apply(edtr);
 }

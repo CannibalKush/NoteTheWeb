@@ -2,9 +2,9 @@ const path = require("path");
 const webpack = require("webpack");
 
 module.exports = {
-  entry: "./src/firefox-draw.ts",
+  entry: "./src/notetheweb.ts",
   output: {
-    filename: "firefox-draw.bundle.js",
+    filename: "notetheweb.bundle.js",
     path: path.resolve(__dirname, "."),
   },
   mode: "development",
