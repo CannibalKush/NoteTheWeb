@@ -27,11 +27,17 @@ const initializeEditor = () => {
   });
 
   editor.notifier.on(EditorEventType.ViewportChanged, (event) => {
+    console.log("syncViewport");
+    console.log(
+      editor.viewport.visibleRect.x - window.scrollX,
+      editor.viewport.visibleRect.y - window.scrollY
+    );
     setTimeout(() => {
       if (
-        editor.viewport.visibleRect.x - window.scrollX > 1 ||
-        editor.viewport.visibleRect.y - window.scrollY > 1
+        Math.abs(editor.viewport.visibleRect.x - window.scrollX) > 1 ||
+        Math.abs(editor.viewport.visibleRect.y - window.scrollY) > 1
       ) {
+        console.log("going");
         syncViewport(editor, window);
       }
     }, 100);
